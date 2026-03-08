@@ -19,11 +19,14 @@ import fitz  # PyMuPDF for PDF handling
 from PIL import Image  # PIL Image for image processing
 
 # Setup logging
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/Users/foxx/.openclaw/workspace/kimi_webapp/ocr_debug.log'),
+        logging.FileHandler(os.path.join(LOG_DIR, 'ocr_debug.log')),
         logging.StreamHandler()
     ]
 )
@@ -40,7 +43,12 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Use absolute path for database to avoid working directory issues
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "instance", "users.db")}'
+
+# Ensure instance directory exists (for Railway deployment)
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+os.makedirs(INSTANCE_DIR, exist_ok=True)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)

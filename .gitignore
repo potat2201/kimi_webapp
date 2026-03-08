@@ -40,10 +40,12 @@ Thumbs.db
 # Railway / Production
 .env
 *.log
+logs/
 
 # Database (Railway uses volume for SQLite, but don't commit local db)
 instance/*.db
 *.db
+instance/
 
 # Local development
 ocr_debug.log
