@@ -1232,9 +1232,11 @@ def debug_info():
     })
 
 
-if __name__ == '__main__':
+# Initialize database on startup (runs for both Gunicorn and python app.py)
+with app.app_context():
     init_db()
-    
+
+if __name__ == '__main__':
     # Production mode (Railway) - use PORT env var
     port = int(os.environ.get('PORT', 5000))
     is_production = os.environ.get('RAILWAY_ENVIRONMENT') is not None
