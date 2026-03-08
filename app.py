@@ -18,6 +18,16 @@ import logging
 import fitz  # PyMuPDF for PDF handling
 from PIL import Image  # PIL Image for image processing
 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Use absolute path for database to avoid working directory issues
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Ensure instance directory exists (for Railway deployment)
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+os.makedirs(INSTANCE_DIR, exist_ok=True)
+
 # Setup logging
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -31,8 +41,6 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
-
-app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Session configuration for multi-host access (IP, localhost, internal DNS)
@@ -41,13 +49,7 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True if using HTTPS
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Use absolute path for database to avoid working directory issues
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Ensure instance directory exists (for Railway deployment)
-INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
-os.makedirs(INSTANCE_DIR, exist_ok=True)
-
+# Database config (BASE_DIR and INSTANCE_DIR already defined above)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
