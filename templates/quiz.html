@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cool School AI - 香港學校專用</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            max-width: 850px;
+            width: 100%;
+            padding: 48px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 36px;
+            font-size: 1.05em;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #444;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+            line-height: 1.6;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        textarea:hover {
+            border-color: #d0d0d0;
+            background: #fff;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 17px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f0f0f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 36px;
+            animation: slideIn 0.4s ease;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-container h3 {
+            color: #667eea;
+            margin-bottom: 16px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .question-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 18px 18px 18px 4px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .question-bubble strong {
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .answer-wrapper {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 18px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .answer-display {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .answer-display h1,
+        .answer-display h2,
+        .answer-display h3,
+        .answer-display h4 {
+            color: #1a1a1a;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .answer-display h1 {
+            font-size: 24px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .answer-display h2 {
+            font-size: 20px;
+            color: #4a4a4a;
+        }
+
+        .answer-display h3 {
+            font-size: 17px;
+            color: #555;
+        }
+
+        .answer-display p {
+            margin-bottom: 16px;
+        }
+
+        .answer-display ul,
+        .answer-display ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .answer-display li {
+            margin-bottom: 8px;
+        }
+
+        .answer-display strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .answer-display code {
+            background: #f4f4f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            color: #e83e8c;
+        }
+
+        .answer-display pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .answer-display pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .answer-display blockquote {
+            border-left: 4px solid #667eea;
+            margin: 16px 0;
+            padding: 12px 20px;
+            background: #f8f9ff;
+            border-radius: 0 8px 8px 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        .answer-display table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .answer-display th,
+        .answer-display td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .answer-display th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 20px;
+            background: #667eea;
+            animation: blink 1s infinite;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border-left: 4px solid #d32f2f;
+            font-size: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 36px;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .credit-alert {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            border: 2px solid #ef5350;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 83, 80, 0); }
+        }
+
+        .credit-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .credit-badge.zero {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .quick-tags {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .tag-label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 14px;
+            margin: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Step-by-step Selection Styles - IMPROVED COLORS */
+        .selection-container {
+            background: #f0f4f8;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 2px solid #d0d8e0;
+        }
+
+        .selection-title {
+            text-align: center;
+            color: #1a1a1a;
+            font-size: 1.3em;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .selection-step {
+            margin-bottom: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .selection-step.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-label {
+            display: block;
+            font-size: 15px;
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .option-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 16px 20px;
+            background: #ffffff;
+            border: 2px solid #b0b8c0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #e8f0ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option-icon {
+            font-size: 2em;
+        }
+
+        .option-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .option-btn.selected .option-text {
+            color: white;
+        }
+
+        .selection-summary {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 20px;
+            border: 3px solid #667eea;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .selection-summary.hidden {
+            display: none;
+        }
+
+        .selection-summary p {
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+
+        #selectedDisplay {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .reset-btn {
+            background: #f5f5f5;
+            color: #555;
+            border: 2px solid #ccc;
+            padding: 16px 32px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 10px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logout-btn {
+            padding: 6px 14px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .logout-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if credits == 0 %}
+        <div class="credit-alert">
+            ⚠️ 您的積分已用完，請聯絡管理員充值
+        </div>
+        {% endif %}
+
+        <div class="header">
+            <a href="{{ url_for('index') }}" class="back-btn">← 返回功能選擇</a>
+            <div class="user-info">
+                👤 歡迎，{{ current_user.username }}！
+                {% if credits >= 900 %}<span class="credit-badge">♾️ 管理員無限</span>{% else %}<span class="credit-badge">💎 剩餘積分: {{ credits }}</span>{% endif %}
+                <a href="{{ url_for('logout') }}" class="logout-btn">登出</a>
+            </div>
+        </div>
+        <h1>📝 出題助手</h1>
+        <p class="subtitle">香港學校專用版 · 符合教育局課程指引</p>
+
+        <!-- Step-by-step Selection Interface -->
+        <div class="selection-container">
+            <h3 class="selection-title">📚 請選擇出題設定</h3>
+            
+            <!-- Step 1: School Type -->
+            <div class="selection-step" id="step1">
+                <label class="step-label">第一步：選擇學校類型</label>
+                <div class="option-group">
+                    <button type="button" class="option-btn" data-value="primary" onclick="selectSchoolType('primary')">
+                        <span class="option-icon">🏫</span>
+                        <span class="option-text">小學</span>
+                    </button>
+                    <button type="button" class="option-btn" data-value="secondary" onclick="selectSchoolType('secondary')">
+                        <span class="option-icon">🎓</span>
+                        <span class="option-text">中學</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Grade Level (Hidden initially) -->
+            <div class="selection-step hidden" id="step2">
+                <label class="step-label">第二步：選擇年級</label>
+                <div class="option-group" id="gradeOptions">
+                    <!-- Dynamic grade buttons will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Step 3: Subject (Hidden initially) -->
+            <div class="selection-step hidden" id="step3">
+                <label class="step-label">第三步：選擇科目</label>
+                <div class="option-group">
+                    <button type="button" class="option-btn subject-btn" data-value="chinese" onclick="selectSubject('chinese')">
+                        <span class="option-icon">📖</span>
+                        <span class="option-text">中文</span>
+                    </button>
+                    <button type="button" class="option-btn subject-btn" data-value="english" onclick="selectSubject('english')">
+                        <span class="option-icon">🔤</span>
+                        <span class="option-text">英文</span>
+                    </button>
+                    <button type="button" class="option-btn subject-btn" data-value="math" onclick="selectSubject('math')">
+                        <span class="option-icon">🔢</span>
+                        <span class="option-text">數學</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selected Summary -->
+            <div class="selection-summary hidden" id="selectionSummary">
+                <p>已選擇：<span id="selectedDisplay"></span></p>
+                <button type="button" class="generate-btn" onclick="generatePrompt()">✨ 生成出題要求</button>
+                <button type="button" class="reset-btn" onclick="resetSelection()">🔄 重新選擇</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="question">出題要求（可手動修改）：</label>
+            <textarea id="question" placeholder="請選擇上方選項，或在此輸入自訂出題要求">{{ default_question }}</textarea>
+            <p class="input-hint">💡 提示：數學式會用純文字顯示（如 3a、x^2），避免使用 $ 符號造成混淆</p>
+        </div>
+
+        <div class="button-container">
+            <button id="askBtn" onclick="askKimi()">
+                🚀 開始出題
+            </button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在出題，請稍候 ⏳</p>
+        </div>
+
+        <div class="result-container" id="result">
+            <div class="question-bubble" id="displayQuestion"></div>
+            <div class="answer-wrapper">
+                <div class="answer-display" id="displayAnswer"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            專為香港學校設計 · 符合教育局課程指引 · 由 Kimi K2.5 提供技術支援
+        </div>
+    </div>
+
+    <script>
+        // Configure marked.js for better rendering
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: false,
+            mangle: false
+        });
+
+        // Helper function to escape HTML (prevent XSS)
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update credits display
+        function updateCreditsDisplay(credits) {
+            const creditBadge = document.querySelector('.credit-badge');
+            if (creditBadge) {
+                creditBadge.textContent = `💎 剩餘積分: ${credits}`;
+                if (credits === 0) {
+                    creditBadge.classList.add('zero');
+                }
+            }
+        }
+
+        // Show credit alert
+        function showCreditAlert() {
+            const container = document.querySelector('.container');
+            let alert = document.querySelector('.credit-alert');
+            if (!alert) {
+                alert = document.createElement('div');
+                alert.className = 'credit-alert';
+                alert.textContent = '⚠️ 您的積分已用完，請聯絡管理員充值';
+                container.insertBefore(alert, container.firstChild);
+            }
+            // Disable the generate button
+            const btn = document.getElementById('askBtn');
+            btn.disabled = true;
+            btn.textContent = '積分已用完';
+        }
+
+        // Step-by-step Selection Logic
+        let selection = {
+            schoolType: null,
+            grade: null,
+            subject: null
+        };
+
+        const gradeOptions = {
+            primary: ['小一', '小二', '小三', '小四', '小五', '小六'],
+            secondary: ['中一', '中二', '中三', '中四', '中五', '中六']
+        };
+
+        const subjectNames = {
+            chinese: '中文',
+            english: '英文',
+            math: '數學'
+        };
+
+        function selectSchoolType(type) {
+            selection.schoolType = type;
+            selection.grade = null;
+            selection.subject = null;
+
+            // Update UI
+            document.querySelectorAll('#step1 .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`#step1 .option-btn[data-value="${type}"]`).classList.add('selected');
+
+            // Show grade selection
+            const gradeContainer = document.getElementById('gradeOptions');
+            gradeContainer.innerHTML = '';
+            gradeOptions[type].forEach(grade => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'option-btn grade-btn';
+                btn.setAttribute('data-value', grade);
+                btn.innerHTML = `<span class="option-text">${grade}</span>`;
+                btn.onclick = () => selectGrade(grade);
+                gradeContainer.appendChild(btn);
+            });
+
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('selectionSummary').classList.add('hidden');
+        }
+
+        function selectGrade(grade) {
+            selection.grade = grade;
+            selection.subject = null;
+
+            // Update UI
+            document.querySelectorAll('#step2 .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`#step2 .option-btn[data-value="${grade}"]`).classList.add('selected');
+
+            // Show subject selection
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('selectionSummary').classList.add('hidden');
+        }
+
+        function selectSubject(subject) {
+            selection.subject = subject;
+
+            // Update UI
+            document.querySelectorAll('#step3 .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`#step3 .option-btn[data-value="${subject}"]`).classList.add('selected');
+
+            // Show summary
+            const displayText = `${selection.grade}${subjectNames[subject]}`;
+            document.getElementById('selectedDisplay').textContent = displayText;
+            document.getElementById('selectionSummary').classList.remove('hidden');
+        }
+
+        function generatePrompt() {
+            const schoolTypeText = selection.schoolType === 'primary' ? '小學' : '中學';
+            const subjectText = subjectNames[selection.subject];
+
+            const promptTemplates = {
+                chinese: `請為香港${selection.grade}中文科出一份練習題（依照教育局課程指引），只出5道題目（2題選擇題、2題短答題、1題長答題）。題目需適合${selection.grade}學生程度，涵蓋閱讀理解、語文運用及寫作技巧，並附上詳細答案及評分標準。`,
+                english: `請為香港${selection.grade}英文科出一份練習題（依照教育局課程指引），只出5道題目（2題選擇題、2題短答題、1題長答題）。題目需適合${selection.grade}學生程度，涵蓋文法、詞彙及閱讀理解，並附上詳細答案及評分標準。`,
+                math: `請為香港${selection.grade}數學科出一份練習題（依照教育局課程指引），只出5道題目（2題選擇題、2題短答題、1題長答題）。題目需適合${selection.grade}學生程度，使用純文字數學符號（不要用$符號），並附上詳細答案及評分標準。`
+            };
+
+            const textarea = document.getElementById('question');
+            textarea.value = promptTemplates[selection.subject];
+            textarea.focus();
+
+            // Scroll to textarea
+            textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function resetSelection() {
+            selection = { schoolType: null, grade: null, subject: null };
+
+            // Reset all buttons
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Hide steps
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('selectionSummary').classList.add('hidden');
+
+            // Clear grade options
+            document.getElementById('gradeOptions').innerHTML = '';
+        }
+
+        async function askKimi() {
+            const question = document.getElementById('question').value.trim();
+            const btn = document.getElementById('askBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const displayQuestion = document.getElementById('displayQuestion');
+            const displayAnswer = document.getElementById('displayAnswer');
+
+            if (!question) {
+                alert('請輸入出題要求！');
+                return;
+            }
+
+            // UI updates
+            btn.disabled = true;
+            loading.classList.add('active');
+            result.classList.remove('active');
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+
+                // Update credits display
+                if (data.credits_remaining !== undefined) {
+                    updateCreditsDisplay(data.credits_remaining);
+                }
+
+                if (response.status === 403 || data.status === 'error') {
+                    // Out of credits
+                    displayQuestion.innerHTML = '<strong>積分不足</strong>';
+                    displayAnswer.innerHTML = `<div class="error">❌ ${data.message || '您的積分已用完'}</div>`;
+                    result.classList.add('active');
+                    // Show credit alert
+                    showCreditAlert();
+                } else if (data.status === 'success') {
+                    displayQuestion.innerHTML = `<strong>你的要求：</strong><br>${escapeHtml(data.question)}`;
+                    // Convert markdown to HTML for better display
+                    displayAnswer.innerHTML = marked.parse(data.answer);
+                    result.classList.add('active');
+                } else {
+                    throw new Error('無法獲取題目');
+                }
+
+            } catch (error) {
+                displayQuestion.innerHTML = '<strong>出錯</strong>';
+                displayAnswer.innerHTML = `<div class="error">❌ ${escapeHtml(error.message)}</div>`;
+                result.classList.add('active');
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('active');
+            }
+        }
+
+        // Allow Enter key to submit (Ctrl+Enter or Cmd+Enter)
+        document.getElementById('question').addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                askKimi();
+            }
+        });
+    </script>
+</body>
+</html>

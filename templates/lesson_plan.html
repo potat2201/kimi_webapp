@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教案生成 - Cool School AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang HK', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            max-width: 900px;
+            width: 100%;
+            padding: 48px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 10px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .credit-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            padding: 6px 14px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .logout-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 36px;
+            font-size: 1.05em;
+        }
+
+        .credit-alert {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            border: 2px solid #ef5350;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 83, 80, 0); }
+        }
+
+        /* Input Section */
+        .input-section {
+            background: #f0f4f8;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 2px solid #d0d8e0;
+        }
+
+        .input-section h3 {
+            color: #1a1a1a;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid #b0b8c0;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 140px;
+            font-family: inherit;
+            line-height: 1.6;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 28px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 17px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f0f0f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Result Container */
+        .result-container {
+            display: none;
+            margin-top: 36px;
+            animation: slideIn 0.4s ease;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .ppt-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .result-content {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 0 0 16px 16px;
+            border: 1px solid #e8e8e8;
+            border-top: none;
+        }
+
+        .lesson-plan-display {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .lesson-plan-display h1 {
+            text-align: left;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .lesson-plan-display h2 {
+            font-size: 20px;
+            color: #667eea;
+            margin-top: 28px;
+            margin-bottom: 14px;
+        }
+
+        .lesson-plan-display h3 {
+            font-size: 17px;
+            color: #444;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .lesson-plan-display ul, .lesson-plan-display ol {
+            margin: 14px 0;
+            padding-left: 24px;
+        }
+
+        .lesson-plan-display li {
+            margin-bottom: 8px;
+        }
+
+        .lesson-plan-display strong {
+            color: #1a1a1a;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .copy-btn, .download-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn {
+            background: #f5f5f5;
+            color: #555;
+            border: 2px solid #ddd;
+        }
+
+        .copy-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border-left: 4px solid #d32f2f;
+            font-size: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 36px;
+            color: #aaa;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if credits == 0 %}
+        <div class="credit-alert">
+            ⚠️ 您的積分已用完，請聯絡管理員充值
+        </div>
+        {% endif %}
+
+        <div class="header">
+            <a href="{{ url_for('index') }}" class="back-btn">← 返回功能選擇</a>
+            <div class="user-info">
+                👤 歡迎，{{ current_user.username }}！
+                {% if credits >= 900 %}<span class="credit-badge">♾️ 管理員無限</span>{% else %}<span class="credit-badge">💎 剩餘積分: {{ credits }}</span>{% endif %}
+                <a href="{{ url_for('logout') }}" class="logout-btn">登出</a>
+            </div>
+        </div>
+
+        <h1>📚 教案生成</h1>
+        <p class="subtitle">輸入主題，AI 為你生成完整教案大綱，助你製作 PowerPoint</p>
+
+        <div class="input-section">
+            <h3>📝 請輸入教學主題</h3>
+            <div class="input-group">
+                <label for="topic">教學主題及要求：</label>
+                <textarea id="topic" placeholder="例如：
+• 科目：中一數學
+• 課題：畢氏定理
+• 課時：40分鐘
+• 學生人數：30人
+• 特別要求：需要互動活動，配合 PowerPoint 教學">{{ default_topic }}</textarea>
+                <p class="input-hint">💡 提示：越詳細的描述，生成的教案會越符合你的需要</p>
+            </div>
+
+            <div class="button-container">
+                <button id="generateBtn" onclick="generateLessonPlan()">
+                    ✨ 生成教案
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在生成教案，請稍候 ⏳</p>
+        </div>
+
+        <div class="result-container" id="result">
+            <div class="result-header">
+                <h3>📋 教案大綱</h3>
+                <span class="ppt-badge">適合製作 PPT</span>
+            </div>
+            <div class="result-content">
+                <div class="lesson-plan-display" id="lessonPlanDisplay"></div>
+            </div>
+            <div class="action-buttons">
+                <button class="copy-btn" onclick="copyToClipboard()">📋 複製內容</button>
+                <button class="download-btn" onclick="downloadTxt()">💾 下載 TXT</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            Cool School AI · 專為香港學校教師設計 · 符合教育局課程指引
+        </div>
+    </div>
+
+    <script>
+        // Configure marked.js
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: false,
+            mangle: false
+        });
+
+        async function generateLessonPlan() {
+            const topic = document.getElementById('topic').value.trim();
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const display = document.getElementById('lessonPlanDisplay');
+
+            if (!topic) {
+                alert('請輸入教學主題！');
+                return;
+            }
+
+            // UI updates
+            btn.disabled = true;
+            loading.classList.add('active');
+            result.classList.remove('active');
+
+            try {
+                const response = await fetch('/generate_lesson_plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ topic: topic })
+                });
+
+                const data = await response.json();
+
+                // Update credits
+                if (data.credits_remaining !== undefined) {
+                    updateCreditsDisplay(data.credits_remaining);
+                }
+
+                if (response.status === 403 || data.status === 'error') {
+                    display.innerHTML = `<div class="error">❌ ${data.message || '您的積分已用完'}</div>`;
+                    result.classList.add('active');
+                    showCreditAlert();
+                } else if (data.status === 'success') {
+                    display.innerHTML = marked.parse(data.lesson_plan);
+                    result.classList.add('active');
+                    // Scroll to result
+                    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    throw new Error('生成失敗');
+                }
+
+            } catch (error) {
+                display.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                result.classList.add('active');
+            } finally {
+                btn.disabled = false;
+                loading.classList.remove('active');
+            }
+        }
+
+        function updateCreditsDisplay(credits) {
+            const creditBadge = document.querySelector('.credit-badge');
+            if (creditBadge) {
+                creditBadge.textContent = `💎 剩餘積分: ${credits}`;
+                if (credits === 0) {
+                    creditBadge.style.background = '#e0e0e0';
+                    creditBadge.style.color = '#999';
+                }
+            }
+        }
+
+        function showCreditAlert() {
+            const container = document.querySelector('.container');
+            let alert = document.querySelector('.credit-alert');
+            if (!alert) {
+                alert = document.createElement('div');
+                alert.className = 'credit-alert';
+                alert.textContent = '⚠️ 您的積分已用完，請聯絡管理員充值';
+                container.insertBefore(alert, container.firstChild);
+            }
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = '積分已用完';
+        }
+
+        function copyToClipboard() {
+            const display = document.getElementById('lessonPlanDisplay');
+            const text = display.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已複製到剪貼簿！');
+            }).catch(() => {
+                alert('複製失敗，請手動複製');
+            });
+        }
+
+        function downloadTxt() {
+            const display = document.getElementById('lessonPlanDisplay');
+            const text = display.innerText;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '教案大綱.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

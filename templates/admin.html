@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員控制台 - Cool School AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang HK', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5em;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .logo-text p {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .page-title p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.1em;
+        }
+
+        .alert {
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .table-header h3 {
+            font-size: 1.3em;
+            color: #333;
+        }
+
+        .users-count {
+            background: #f0f0f0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .username-cell {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .credits-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .credits-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .credits-badge.zero {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .credits-badge.unlimited {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .add-credit-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .credit-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .credit-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-type.admin {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .user-type.regular {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .add-credit-form {
+                flex-direction: column;
+            }
+
+            .credit-input {
+                width: 100%;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <span class="logo-icon">🛡️</span>
+                <div class="logo-text">
+                    <h1>管理員控制台</h1>
+                    <p>Cool School AI</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="admin-badge">ADMIN</span>
+                <a href="{{ url_for('index') }}" class="back-btn">← 返回功能選擇</a>
+            </div>
+        </div>
+
+        <div class="page-title">
+            <h2>用戶積分管理</h2>
+            <p>管理所有用戶的積分餘額</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="users-table-container">
+            <div class="table-header">
+                <h3>👥 用戶列表</h3>
+                <span class="users-count">共 {{ users|length }} 位用戶</span>
+            </div>
+
+            {% if users %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>用戶名稱</th>
+                        <th>類型</th>
+                        <th>剩餘積分</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="username-cell">{{ user.username }}</td>
+                        <td>
+                            {% if user.username == 'admin' %}
+                            <span class="user-type admin">管理員</span>
+                            {% else %}
+                            <span class="user-type regular">一般用戶</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="credits-display">
+                                {% if user.username == 'admin' %}
+                                <span class="credits-badge unlimited">∞ 無限</span>
+                                {% elif user.credits == 0 %}
+                                <span class="credits-badge zero">{{ user.credits }} 分</span>
+                                {% else %}
+                                <span class="credits-badge">{{ user.credits }} 分</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.username != 'admin' %}
+                            <form method="POST" action="{{ url_for('add_credits', user_id=user.id) }}" class="add-credit-form">
+                                <input type="number" name="credits" class="credit-input" value="5" min="1" max="100" required>
+                                <button type="submit" class="add-btn">➕ 充值</button>
+                            </form>
+                            {% else %}
+                            <span style="color: #999; font-size: 13px;">管理員無需充值</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p>暫時沒有用戶資料</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

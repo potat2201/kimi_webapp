@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能選擇 - Cool School AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang HK', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5em;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .logo-text p {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-msg {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .logout-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .page-title p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.1em;
+        }
+
+        .function-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .function-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .function-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .function-card.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .function-card.primary:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .function-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .function-card.primary .function-icon {
+            font-size: 4em;
+        }
+
+        .function-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .function-card.primary .function-name {
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .function-desc {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .function-card.primary .function-desc {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .function-card.coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .function-card.coming-soon:hover {
+            transform: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .function-card.primary .badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f5f5f5;
+            color: #999;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .function-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <span class="logo-icon">🎓</span>
+                <div class="logo-text">
+                    <h1>Cool School AI</h1>
+                    <p>香港學校專用版</p>
+                </div>
+            </div>
+            <div class="user-section">
+                <span class="welcome-msg">歡迎，{{ current_user.username }} 👋</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">登出</a>
+            </div>
+        </div>
+
+        <div class="page-title">
+            <h2>選擇功能</h2>
+            <p>請選擇你需要使用的教學工具</p>
+        </div>
+
+        <div class="function-grid">
+            <!-- Block 1: Quiz Generator (Primary) -->
+            <a href="{{ url_for('quiz_generator') }}" class="function-card primary">
+                <span class="function-icon">📝</span>
+                <h3 class="function-name">出題助手</h3>
+                <p class="function-desc">Cool School AI 為香港中小學各科自動生成練習題，符合教育局課程指引</p>
+                <span class="badge">⭐ 推薦使用</span>
+            </a>
+
+            <!-- Block 2 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">📊</span>
+                <h3 class="function-name">試卷分析</h3>
+                <p class="function-desc">分析試卷難度分布及學生表現數據</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 3: Lesson Plan Generator -->
+            <a href="{{ url_for('lesson_plan_generator') }}" class="function-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                <span class="function-icon">📚</span>
+                <h3 class="function-name">教案生成</h3>
+                <p class="function-desc" style="color: rgba(255,255,255,0.9);">輸入主題，AI 生成完整教案大綱，助你製作 PowerPoint</p>
+                <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">新功能</span>
+            </a>
+
+            <!-- Block 4 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">🎯</span>
+                <h3 class="function-name">學習目標</h3>
+                <p class="function-desc">制定符合課程指引的學習目標及評估準則</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 5 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">💬</span>
+                <h3 class="function-name">課堂討論</h3>
+                <p class="function-desc">生成啟發性的課堂討論問題及活動建議</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 6: Composition Checker -->
+            <a href="{{ url_for('composition_checker') }}" class="function-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <span class="function-icon">✍️</span>
+                <h3 class="function-name">作文批改</h3>
+                <p class="function-desc" style="color: rgba(255,255,255,0.9);">協助批改中文/英文作文，提供評分及改善建議</p>
+                <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">新功能</span>
+            </a>
+
+            <!-- Block 7 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">🔬</span>
+                <h3 class="function-name">實驗設計</h3>
+                <p class="function-desc">為科學科設計安全可行的實驗活動</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 8 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">📋</span>
+                <h3 class="function-name">評語生成</h3>
+                <p class="function-desc">快速生成個性化學生評語及進度報告</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 9 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">🎨</span>
+                <h3 class="function-name">視覺教材</h3>
+                <p class="function-desc">設計概念圖、思維導圖等視覺教學材料</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 10 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">📖</span>
+                <h3 class="function-name">閱讀材料</h3>
+                <p class="function-desc">按程度生成適合的閱讀理解材料</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 11 -->
+            <div class="function-card coming-soon">
+                <span class="function-icon">⏰</span>
+                <h3 class="function-name">課堂計時</h3>
+                <p class="function-desc">智能課堂時間管理工具及提醒</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+
+            <!-- Block 12 -->
+            <!-- Block 12: Admin Panel (Only visible to admin) -->
+            {% if current_user.username == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}" class="function-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white;">
+                <span class="function-icon">🛡️</span>
+                <h3 class="function-name">管理員控制台</h3>
+                <p class="function-desc" style="color: rgba(255,255,255,0.9);">管理用戶積分、查看系統狀態</p>
+                <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">管理員專用</span>
+            </a>
+            {% else %}
+            <div class="function-card coming-soon">
+                <span class="function-icon">🔧</span>
+                <h3 class="function-name">系統設定</h3>
+                <p class="function-desc">管理帳戶設定及個人化偏好</p>
+                <span class="coming-soon-badge">即將推出</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

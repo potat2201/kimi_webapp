@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>OCR Test - Cool School AI</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .upload-area { border: 3px dashed #ccc; padding: 40px; text-align: center; cursor: pointer; }
+        .upload-area:hover { border-color: #666; background: #f5f5f5; }
+        #result { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px; white-space: pre-wrap; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        textarea { width: 100%; height: 100px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 OCR 測試頁面</h1>
+    <p>上傳一張包含文字的圖片測試 OCR 功能</p>
+    
+    <div class="upload-area" onclick="document.getElementById('file').click()">
+        <p>📤 點擊上傳圖片</p>
+        <p><small>支援 JPG, PNG, HEIC</small></p>
+    </div>
+    <input type="file" id="file" accept="image/*" style="display:none" onchange="handleFile(event)">
+    
+    <div id="preview" style="margin: 20px 0;"></div>
+    
+    <button onclick="testOCR()" id="testBtn" disabled>🚀 測試 OCR</button>
+    
+    <div id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script>
+        let imageBase64 = null;
+        
+        async function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            console.log('File selected:', file.name, file.type, file.size);
+            
+            let processedFile = file;
+            
+            // Check if HEIC
+            const ext = file.name.toLowerCase().split('.').pop();
+            if (ext === 'heic' || ext === 'heif') {
+                console.log('Converting HEIC...');
+                try {
+                    const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+                    processedFile = new File([blob], 'converted.jpg', { type: 'image/jpeg' });
+                    console.log('HEIC converted');
+                } catch (e) {
+                    console.error('HEIC conversion failed:', e);
+                    alert('HEIC conversion failed: ' + e.message);
+                    return;
+                }
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageBase64 = e.target.result;
+                console.log('Base64 loaded, length:', imageBase64.length);
+                
+                // Show preview
+                document.getElementById('preview').innerHTML = `
+                    <p>✅ 圖片已載入 (${(imageBase64.length / 1024).toFixed(1)} KB)</p>
+                    <img src="${imageBase64}" style="max-width: 300px; max-height: 200px;">
+                `;
+                document.getElementById('testBtn').disabled = false;
+            };
+            reader.readAsDataURL(processedFile);
+        }
+        
+        async function testOCR() {
+            if (!imageBase64) {
+                alert('請先上傳圖片');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>⏳ 正在測試 OCR，請稍候...</p>';
+            document.getElementById('testBtn').disabled = true;
+            
+            try {
+                console.log('Sending request...');
+                const response = await fetch('/test-ocr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_data: imageBase64 })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <h3 class="success">✅ OCR 成功！</h3>
+                        <h4>提取文字：</h4>
+                        <div style="background:white; padding:15px; border-radius:5px;">${data.extracted_text.replace(/</g, '&lt;')}</div>
+                        <h4>Debug Info：</h4>
+                        <pre>${JSON.stringify(data.debug_info, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3 class="error">❌ OCR 失敗</h3>
+                        <p><strong>錯誤：</strong>${data.error}</p>
+                        <h4>Debug Info：</h4>
+                        <pre>${JSON.stringify(data.debug_info || [], null, 2)}</pre>
+                        <h4>完整回應：</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3 class="error">❌ 請求失敗</h3>
+                    <p>${error.message}</p>
+                `;
+            } finally {
+                document.getElementById('testBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
