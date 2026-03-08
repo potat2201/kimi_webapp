@@ -19,7 +19,6 @@ import fitz  # PyMuPDF for PDF handling
 from PIL import Image  # PIL Image for image processing
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Use absolute path for database to avoid working directory issues
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -41,6 +40,7 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Session configuration for multi-host access (IP, localhost, internal DNS)
