@@ -101,7 +101,7 @@ MODEL = "kimi-k2.5"
 DEFAULT_QUESTION = "請為香港中一數學科（教育局課程指引）出一份關於代數的練習題，只出5道題目（2題選擇題、2題短答題、1題長答題），並附上答案及評分標準"
 
 
-def ask_kimi(question, temperature=1.0, max_tokens=2000):
+def ask_kimi(question, temperature=1.0, max_tokens=8000):
     """Send question to Kimi and return response"""
     headers = {
         "Authorization": f"Bearer {API_KEY}",
