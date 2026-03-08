@@ -1108,7 +1108,7 @@ def init_db():
         admin = User.query.filter_by(username='admin').first()
         if not admin:
             admin = User(username='admin')
-            admin.set_password('kimi2024')  # Change this!
+            admin.set_password('Kimi2026')  # Change this!
             admin.credits = 999  # Admin has unlimited credits
             db.session.add(admin)
             db.session.commit()
@@ -1130,7 +1130,7 @@ def init_db():
         if not userB:
             userB = User(username='userB')
             userB.set_password('Coolwalk_123')
-            userB.credits = 5
+            userB.credits = 15
             db.session.add(userB)
             db.session.commit()
             print("✅ 用戶已建立：userB / Coolwalk_123 (5積分)")
