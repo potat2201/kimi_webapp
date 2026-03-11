@@ -51,7 +51,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Database config - Support both Railway PostgreSQL and local SQLite
 DATABASE_URL = os.environ.get('DATABASE_URL')
-is_railway = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+is_railway = os.environ.get('RAILWAY_ENVIRONMENT') is not None or os.environ.get('RAILWAY_SERVICE_ID') is not None
 
 if DATABASE_URL:
     # Production: Railway PostgreSQL
@@ -59,12 +59,16 @@ if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     logger.info("Using PostgreSQL database (Railway)")
 elif is_railway:
-    # Safety check: In Railway production, must have DATABASE_URL
-    raise RuntimeError(
-        "ERROR: RAILWAY_ENVIRONMENT is set but DATABASE_URL is missing! "
-        "Please add a PostgreSQL database to your Railway project. "
-        "User data will be lost if using SQLite in production."
-    )
+    # Railway detected but no DATABASE_URL - this is a configuration issue
+    # Log warning and fallback to SQLite (for backward compatibility)
+    logger.warning("=" * 60)
+    logger.warning("WARNING: Running in Railway but DATABASE_URL not found!")
+    logger.warning("User data will NOT persist across deployments.")
+    logger.warning("Please add a PostgreSQL database to your Railway project.")
+    logger.warning("=" * 60)
+    # Fallback to SQLite (data will be lost on redeploy)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
+    logger.info("Using SQLite database (Railway fallback - data not persistent)")
 else:
     # Development: Local SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
