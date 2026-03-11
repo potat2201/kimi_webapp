@@ -51,11 +51,20 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Database config - Support both Railway PostgreSQL and local SQLite
 DATABASE_URL = os.environ.get('DATABASE_URL')
+is_railway = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+
 if DATABASE_URL:
     # Production: Railway PostgreSQL
     # SQLAlchemy requires 'postgresql://' instead of 'postgres://'
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     logger.info("Using PostgreSQL database (Railway)")
+elif is_railway:
+    # Safety check: In Railway production, must have DATABASE_URL
+    raise RuntimeError(
+        "ERROR: RAILWAY_ENVIRONMENT is set but DATABASE_URL is missing! "
+        "Please add a PostgreSQL database to your Railway project. "
+        "User data will be lost if using SQLite in production."
+    )
 else:
     # Development: Local SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
