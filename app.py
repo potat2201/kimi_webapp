@@ -49,8 +49,18 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True if using HTTPS
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Database config (BASE_DIR and INSTANCE_DIR already defined above)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
+# Database config - Support both Railway PostgreSQL and local SQLite
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Production: Railway PostgreSQL
+    # SQLAlchemy requires 'postgresql://' instead of 'postgres://'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    logger.info("Using PostgreSQL database (Railway)")
+else:
+    # Development: Local SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(INSTANCE_DIR, "users.db")}'
+    logger.info("Using SQLite database (Local)")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
